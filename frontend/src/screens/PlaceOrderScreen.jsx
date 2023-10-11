@@ -24,7 +24,7 @@ const PlaceOrderScreen = () => {
     }
   }, [cart.paymentMethod, cart.shippingAddress.address, navigate]);
 
-  const PlaceOrderHandler = async () => {
+  const placeOrderHandler = async () => {
     try {
       const res = await createOrder({
         orderItems: cart.cartItems,
@@ -141,7 +141,7 @@ const PlaceOrderScreen = () => {
                   type="button"
                   className="btn-black"
                   disabled={cart.cartItems.length === 0}
-                  onClick={PlaceOrderHandler}
+                  onClick={placeOrderHandler}
                 >
                   Place Order
                 </Button>
