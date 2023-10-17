@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+import axios from "axios";
 const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL } = process.env;
 
 /**
@@ -25,17 +26,38 @@ async function getPayPalAccessToken() {
   };
 
   const body = "grant_type=client_credentials";
-  const response = await fetch(url, {
-    method: "POST",
-    headers,
-    body,
-  });
+  // const response = await fetch(url, {
+  //   method: "POST",
+  //   headers,
+  //   body,
+  // });
+  const config = {
+    method: "post", // HTTP POST request
+    url: url, // The URL you want to send the request to
+    headers: headers, // The headers for your request
+    data: body, // The request body
+  };
 
-  if (!response.ok) throw new Error("Failed to get access token");
+  try {
+    const response = await axios(config);
+    // You can access response data, status, and more here
+    console.log(response.data);
 
-  const paypalData = await response.json();
+    // if (!response.ok) throw new Error("Failed to get access token");
 
-  return paypalData.access_token;
+    // const paypalData = await response.json();
+
+    // return paypalData.access_token;
+
+    if (!response.status === 200) {
+      throw new Error("Failed to get access token");
+    }
+
+    const paypalData = response.data;
+    return paypalData.access_token;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 /**
