@@ -94,20 +94,43 @@ export async function checkIfNewTransaction(orderModel, paypalTransactionId) {
  */
 export async function verifyPayPalPayment(paypalTransactionId) {
   const accessToken = await getPayPalAccessToken();
-  const paypalResponse = await fetch(
-    `${PAYPAL_API_URL}/v2/checkout/orders/${paypalTransactionId}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-  if (!paypalResponse.ok) throw new Error("Failed to verify payment");
+  // const paypalResponse = await fetch(
+  //   `${PAYPAL_API_URL}/v2/checkout/orders/${paypalTransactionId}`,
+  //   {
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${accessToken}`,
+  //     },
+  //   }
+  // );
+  // if (!paypalResponse.ok) throw new Error("Failed to verify payment");
 
-  const paypalData = await paypalResponse.json();
-  return {
-    verified: paypalData.status === "COMPLETED",
-    value: paypalData.purchase_units[0].amount.value,
+  // const paypalData = await paypalResponse.json();
+  // return {
+  //   verified: paypalData.status === "COMPLETED",
+  //   value: paypalData.purchase_units[0].amount.value,
+  // };
+
+  const url = `${PAYPAL_API_URL}/v2/checkout/orders/${paypalTransactionId}`;
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${accessToken}`,
   };
+
+  try {
+    const response = await axios.get(url, { headers });
+
+    if (response.status !== 200) {
+      throw new Error("Failed to verify payment");
+    }
+
+    const paypalData = response.data;
+    return {
+      verified: paypalData.status === "COMPLETED",
+      value: paypalData.purchase_units[0].amount.value,
+    };
+  } catch (error) {
+    // Handle errors here
+    console.error(error);
+  }
 }
